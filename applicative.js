@@ -1,6 +1,7 @@
-'use strict';
+'use strict'
 
 const {identity, thrush} = require('fantasy-combinators')
+var jsv = require('jsv')
 
 /**
 
@@ -12,27 +13,30 @@ const {identity, thrush} = require('fantasy-combinators')
 
 **/
 
-const identityʹ = T => eq => x => {
-    const a = T.ap(T.of(identity), T.of(x));
-    const b = T.of(x);
-    return eq(a, b);
-};
+const identityʹ = T => eq =>
+  jsv.forall("integer", x => {
+    const a = T.ap(T.of(identity), T.of(x))
+    const b = T.of(x)
+    return eq(a, b)
+  })
 
-const homomorphism = T => eq => x => {
-    const a = T.ap(T.of(identity), T.of(x));
-    const b = T.of(identity(x));
-    return eq(a, b);
-};
+const homomorphism = T => eq =>
+  jsc.forall("integer -> integer", "integer", (f, x) => {
+    const a = T.ap(T.of(f), T.of(x))
+    const b = T.of(f(x))
+    return eq(a, b)
+  })
 
-const interchange = T => eq => x => {
-    const u = T.of(identity);
+const interchange = T => eq => {
+  jsc.forall("integer -> integer", "integer", (f, x) => {
+    const u = T.of(f)
 
-    const a = T.ap(u, T.of(x));
-    const b = T.ap(T.of(thrush(x)), u);
-    return eq(a, b);
-};
+    const a = T.ap(u, T.of(x))
+    const b = T.ap(T.of(thrush(x)), u)
+    return eq(a, b)
+  })
 
 module.exports = { identity: identityʹ
                  , homomorphism
                  , interchange 
-                 };
+                 }
